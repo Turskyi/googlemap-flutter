@@ -46,20 +46,23 @@ class _HomePageState extends State<HomePage> {
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    MarkerGenerator(_getMarkerWidgets(), (bitmaps) {
+    MarkerGenerator(_getMarkerWidgets(), (List<Uint8List> bitmaps) {
       setState(() {
-        _markers = _mapBitmapsToMarkers(bitmaps);
+        _markers = _mapBitmapsToMarkers(bitmaps: bitmaps, cities: _cities);
       });
     }).afterFirstLayout(context);
   }
 
-  List<Marker> _mapBitmapsToMarkers(List<Uint8List> bitmaps) {
+  List<Marker> _mapBitmapsToMarkers({
+    required List<Uint8List> bitmaps,
+    required List<City> cities,
+  }) {
     final List<Marker> markersList = [];
-    bitmaps.asMap().forEach((i, bmp) {
+    bitmaps.asMap().forEach((int i, Uint8List bmp) {
       markersList.add(
         Marker(
           markerId: const MarkerId('marker_id'),
-          position: _center,
+          position: cities[i].position,
           infoWindow: const InfoWindow(
             title: "title info window",
             snippet: "snippet info window",
