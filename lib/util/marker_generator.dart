@@ -6,13 +6,13 @@ import 'package:flutter/rendering.dart';
 /// This just adds overlay and builds [_MarkerHelper] on that overlay.
 /// [_MarkerHelper] does all the heavy work of creating and getting bitmaps
 class MarkerGenerator {
-  MarkerGenerator(this.markerWidgets, this.callback);
+  MarkerGenerator({required this.widgets, required this.bitmapsCallback});
 
-  final Function(List<Uint8List>) callback;
-  final List<Widget> markerWidgets;
+  final Function(List<Uint8List>) bitmapsCallback;
+  final List<Widget> widgets;
 
   void generate(BuildContext context) {
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance?.addPostFrameCallback((Duration duration) {
       afterFirstLayout(context);
     });
   }
@@ -25,10 +25,10 @@ class MarkerGenerator {
     final OverlayState? overlayState = Overlay.of(context);
 
     final OverlayEntry entry = OverlayEntry(
-      builder: (context) {
+      builder: (BuildContext context) {
         return _MarkerHelper(
-          markerWidgets: markerWidgets,
-          callback: callback,
+          markerWidgets: widgets,
+          callback: bitmapsCallback,
         );
       },
       maintainState: true,
@@ -40,15 +40,18 @@ class MarkerGenerator {
 
 /// Maps are embedding GoogleMap library for Android/iOS  into flutter.
 ///
-/// These native libraries accept BitmapDescriptor for marker, which means that for custom markers
-/// you need to draw view to bitmap and then send that to BitmapDescriptor.
+/// These native libraries accept BitmapDescriptor for marker,
+/// which means that for custom markers
+/// we need to draw view to bitmap and then send that to BitmapDescriptor.
 ///
-/// Because of that Flutter also cannot accept Widget for marker, but you need draw it to bitmap and
-/// that's what this widget does:
+/// Because Flutter also cannot accept Widget for marker,
+/// we need draw it to bitmap and
+/// that's what [_MarkerHelper] widget does:
 ///
 /// 1) It draws marker widget to tree
-/// 2) After painted access the repaint boundary with global key and converts it to uInt8List
-/// 3) Returns set of Uint8List (bitmaps) through callback
+/// 2) After painted access the repaint boundary with global key
+/// and converts it to [Uint8List]
+/// 3) Returns set of [Uint8List] (bitmaps) through callback.
 class _MarkerHelper extends StatefulWidget {
   const _MarkerHelper({
     Key? key,
@@ -115,12 +118,11 @@ class _MarkerHelperState extends State<_MarkerHelper> with AfterLayoutMixin {
   }
 }
 
-/// AfterLayoutMixin
 mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance?.addPostFrameCallback((Duration duration) {
       afterFirstLayout(context);
     });
   }

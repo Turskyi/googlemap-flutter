@@ -46,11 +46,14 @@ class _HomePageState extends State<HomePage> {
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    MarkerGenerator(_buildMarkerWidgets(), (List<Uint8List> bitmaps) {
-      setState(() {
-        _markers = _mapBitmapsToMarkers(bitmaps: bitmaps, cities: _cities);
-      });
-    }).afterFirstLayout(context);
+    MarkerGenerator(
+      widgets: _buildMarkerWidgets(),
+      bitmapsCallback: (List<Uint8List> bitmaps) {
+        setState(() {
+          _markers = _mapBitmapsToMarkers(bitmaps: bitmaps, cities: _cities);
+        });
+      },
+    ).afterFirstLayout(context);
   }
 
   List<Marker> _mapBitmapsToMarkers({
@@ -58,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     required List<City> cities,
   }) {
     final List<Marker> markersList = [];
-    bitmaps.asMap().forEach((int i, Uint8List bmp) {
+    bitmaps.asMap().forEach((int i, Uint8List uInt8List) {
       markersList.add(
         Marker(
           markerId: const MarkerId('marker_id'),
@@ -67,7 +70,7 @@ class _HomePageState extends State<HomePage> {
             title: "title info window",
             snippet: "snippet info window",
           ),
-          icon: BitmapDescriptor.fromBytes(bmp),
+          icon: BitmapDescriptor.fromBytes(uInt8List),
           // hiding InfoWindow
           consumeTapEvents: true,
           onTap: () => debugPrint("Clicked "),
