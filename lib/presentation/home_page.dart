@@ -1,14 +1,13 @@
 import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:googlemap/domain/city.dart';
 import 'package:googlemap/presentation/marker_widget.dart';
 import 'package:googlemap/util/marker_generator.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({Key? key, required this.title}) : super(key: key);
+  const HomePage({super.key, required this.title});
 
   final String title;
 
@@ -70,7 +69,7 @@ class _HomePageState extends State<HomePage> {
             title: "title info window",
             snippet: "snippet info window",
           ),
-          icon: BitmapDescriptor.fromBytes(uInt8List),
+          icon: BitmapDescriptor.bytes(uInt8List),
           // hiding InfoWindow
           consumeTapEvents: true,
           onTap: () => debugPrint("Clicked "),

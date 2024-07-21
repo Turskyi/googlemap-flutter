@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
@@ -12,7 +13,7 @@ class MarkerGenerator {
   final List<Widget> widgets;
 
   void generate(BuildContext context) {
-    WidgetsBinding.instance?.addPostFrameCallback((Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration duration) {
       afterFirstLayout(context);
     });
   }
@@ -22,7 +23,7 @@ class MarkerGenerator {
   }
 
   void addOverlay(BuildContext context) {
-    final OverlayState? overlayState = Overlay.of(context);
+    final OverlayState overlayState = Overlay.of(context);
 
     final OverlayEntry entry = OverlayEntry(
       builder: (BuildContext context) {
@@ -34,7 +35,7 @@ class MarkerGenerator {
       maintainState: true,
     );
 
-    overlayState?.insert(entry);
+    overlayState.insert(entry);
   }
 }
 
@@ -54,10 +55,10 @@ class MarkerGenerator {
 /// 3) Returns set of [Uint8List] (bitmaps) through callback.
 class _MarkerHelper extends StatefulWidget {
   const _MarkerHelper({
-    Key? key,
     required this.markerWidgets,
     required this.callback,
-  }) : super(key: key);
+  });
+
   final List<Widget> markerWidgets;
   final Function(List<Uint8List>) callback;
 
@@ -96,17 +97,19 @@ class _MarkerHelperState extends State<_MarkerHelper> with AfterLayoutMixin {
   }
 
   Future<List<Uint8List>> _getBitmaps(BuildContext context) async {
-    final Iterable<Future<Uint8List>> futures = globalKeys.map((key) => _getUint8List(key));
+    final Iterable<Future<Uint8List>> futures =
+        globalKeys.map((key) => _getUint8List(key));
     return Future.wait(futures);
   }
 
   Future<Uint8List> _getUint8List(GlobalKey markerKey) async {
     Uint8List uint8list = Uint8List(0);
-    if (markerKey.currentContext != null &&
-        markerKey.currentContext!.findRenderObject() != null &&
-        markerKey.currentContext!.findRenderObject() is RenderRepaintBoundary) {
-      final RenderRepaintBoundary boundary = markerKey.currentContext!
-          .findRenderObject()! as RenderRepaintBoundary;
+    final BuildContext? markerKeyBuildContext = markerKey.currentContext;
+    final RenderObject? renderObject =
+        markerKeyBuildContext?.findRenderObject();
+    if (markerKeyBuildContext != null &&
+        renderObject is RenderRepaintBoundary) {
+      final RenderRepaintBoundary boundary = renderObject;
       final ui.Image image = await boundary.toImage(pixelRatio: 2.0);
       final ByteData? byteData =
           await image.toByteData(format: ui.ImageByteFormat.png);
@@ -122,7 +125,7 @@ mixin AfterLayoutMixin<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((Duration duration) {
+    WidgetsBinding.instance.addPostFrameCallback((Duration duration) {
       afterFirstLayout(context);
     });
   }

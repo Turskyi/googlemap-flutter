@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class MarkerWidget extends StatelessWidget {
   const MarkerWidget({required this.name});
@@ -24,12 +23,7 @@ class MarkerWidget extends StatelessWidget {
             size: kIsWeb ? 6 : 28,
             color: Colors.green,
           ),
-          Text(
-            name,
-            style: kIsWeb
-                ? Theme.of(context).textTheme.overline?.copyWith(fontSize: 6)
-                : Theme.of(context).textTheme.headline5,
-          ),
+          Text(name),
         ],
       ),
     );

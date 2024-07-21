@@ -1,7 +1,6 @@
 buildscript {
     ext {
-        // App dependency versions
-        kotlin_version = '1.5.31'
+        application_id = 'io.github.turskyi.googlemap'
 
         getParam = { key ->
             def value = System.getenv(key) ?: project.findProperty("env.$key")
@@ -12,15 +11,6 @@ buildscript {
         }
 
         MAPS_API_KEY = getParam("MAPS_API_KEY")
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-
-    dependencies {
-        classpath 'com.android.tools.build:gradle:7.0.3'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -37,6 +27,6 @@ subprojects {
     project.evaluationDependsOn(':app')
 }
 
-task clean(type: Delete) {
+tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
